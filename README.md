@@ -1,12 +1,11 @@
 # code_split
 
-Tool to split large Python code per Class and Functions
-
+Split Python code files for class and function
 
 ## Description
 
-A longer description of your project goes here...
-
+This script will split a Python code file into separate files per main class or function.
+The new files will be named as per the function it contains.
 
 <!-- pyscaffold-notes -->
 
