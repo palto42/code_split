@@ -4,7 +4,11 @@ Split Python code files for class and function
 
 import argparse
 import logging
+import os
+import re
 import sys
+
+from attr import s
 
 from code_split import __version__
 
@@ -22,20 +26,40 @@ _logger = logging.getLogger(__name__)
 # when using this Python module as a library.
 
 
-def fib(n):
-    """Fibonacci example function
+def split_code(src_code: str, folder: str) -> None:
+    if not src_code.startswith("/"):
+        src_code = os.path.join(os.getcwd(), src_code)
+        _logger.debug("Appended CWD to input file path")
+    if not folder:
+        folder = os.getcwd()
+    elif not folder.startswith("/"):
+        folder = os.path.join(os.getcwd(), folder)
+    if not os.path.isdir(folder):
+        _logger.info("Create output folder %s", folder)
+        os.makedirs(folder)
+    file_header = ""
+    out_file = None
+    try:
+        with open(src_code, "r", encoding="utf-8") as file:
+            for line in file.readlines():
 
-    Args:
-      n (int): integer
-
-    Returns:
-      int: n-th Fibonacci number
-    """
-    assert n > 0
-    a, b = 1, 1
-    for _i in range(n - 1):
-        a, b = b, a + b
-    return a
+                if line.startswith("def") or line.startswith("class"):
+                    out_file_name = re.findall(r"^\w+\s+(\w+).*", line)[0] + ".py"
+                    _logger.info("NEW output file: %s", out_file_name)
+                    if out_file:
+                        out_file.close()
+                    out_file = open(os.path.join(folder, out_file_name), "w", encoding="utf-8")
+                elif not line.startswith(" ") and len(line.strip()) and out_file:
+                    # Class of function ended, either comments or main code
+                    out_file.close()
+                    out_file = None
+                if out_file:
+                    _logger.debug("> %s", line.strip())
+                    out_file.write(line)
+        if out_file:
+            out_file.close()
+    except FileNotFoundError:
+        _logger.error("Can't find input file %s", src_code)
 
 
 # ---- CLI ----
@@ -60,8 +84,8 @@ def parse_args(args):
         action="version",
         version="code_split {ver}".format(ver=__version__),
     )
-    parser.add_argument("-i", "--input", type=str, help="Python code file to be split")
-    parser.add_argument("-f", "--folder", type= str, help="Destination folder for the splitted code")
+    parser.add_argument("-i", "--input", required=True, type=str, help="Python code file to be split")
+    parser.add_argument("-f", "--folder", type=str, help="Destination folder for the splitted code")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -88,9 +112,7 @@ def setup_logging(loglevel):
       loglevel (int): minimum loglevel for emitting messages
     """
     logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
-    logging.basicConfig(
-        level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S"
-    )
+    logging.basicConfig(level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
 
 def main(args):
@@ -105,8 +127,8 @@ def main(args):
     """
     args = parse_args(args)
     setup_logging(args.loglevel)
-    _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
+    _logger.info(f"Split code file '{args.input}' into folder '{args.folder}'")
+    split_code(args.input, args.folder)
     _logger.info("Script ends here")
 
 
