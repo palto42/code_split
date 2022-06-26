@@ -1,7 +1,8 @@
 # Changelog
 
-## Version 0.1 (development)
+## Version 0.9.0 (RC1)
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+Date: 2022-06-26
+
+- First release with minimum required features
+- Full pytest coverage of the code

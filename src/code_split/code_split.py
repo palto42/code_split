@@ -1,12 +1,13 @@
 """
-Split Python code files for class and function
+Split Python code files per class and function
 """
 
 import argparse
 import logging
-import os
 import re
 import sys
+from pathlib import Path
+from typing import List
 
 from attr import s
 
@@ -22,28 +23,43 @@ _logger = logging.getLogger(__name__)
 # ---- Python API ----
 # The functions defined in this section can be imported by users in their
 # Python scripts/interactive interpreter, e.g. via
-# `from code_split.skeleton import fib`,
+# `from code_split.code_split import split_code`,
 # when using this Python module as a library.
 
 
 def split_code(src_code: str, folder: str) -> None:
-    if not src_code.startswith("/"):
-        src_code = os.path.join(os.getcwd(), src_code)
+    """Reads the source code file and writes a new output file
+    per contained top level class and function.
+
+    The functions accepts relative and absolute paths for the scr_code and folder.
+
+    Parameters
+    ----------
+    src_code : str
+        Name of the source code which will be used as input
+    folder : str
+        Output folder for the new files
+    """
+    src_path = Path(src_code)
+    if not src_path.is_absolute():
+        src_path = Path.cwd().joinpath(src_path)
         _logger.debug("Appended CWD to input file path")
-    if not folder:
-        folder = os.getcwd()
-    elif not folder.startswith("/"):
-        folder = os.path.join(os.getcwd(), folder)
-    if not os.path.isdir(folder):
-        _logger.info("Create output folder %s", folder)
-        os.makedirs(folder)
-    file_header = ""
+    if folder:
+        output = Path(folder)
+        if not output.is_absolute():
+            output = Path.cwd().joinpath(output)
+    else:
+        output = Path.cwd()
+
+    if not output.is_dir():
+        _logger.info("Create output folder %s", output)
+        output.mkdir()
     out_file = None
     cache = ""
     blank_lines = ""
     pre_comment = ""
     try:
-        with open(src_code, "r", encoding="utf-8") as file:
+        with src_path.open(encoding="utf-8") as file:
             for line in file.readlines():
                 if line.startswith("@"):
                     cache += line
@@ -52,7 +68,7 @@ def split_code(src_code: str, folder: str) -> None:
                     _logger.info("NEW output file: %s", out_file_name)
                     if out_file:
                         out_file.close()
-                    out_file = open(os.path.join(folder, out_file_name), "w", encoding="utf-8")
+                    out_file = output.joinpath(out_file_name).open("w", encoding="utf-8")
                     out_file.write(pre_comment)
                     pre_comment = ""
                     out_file.write(cache)
@@ -88,15 +104,19 @@ def split_code(src_code: str, folder: str) -> None:
 # executable/script.
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> argparse.Namespace:
     """Parse command line parameters
 
-    Args:
-      args (List[str]): command line parameters as list of strings
-          (for example  ``["--help"]``).
+    Parameters
+    ----------
+    args : List[str]
+        command line parameters as list of strings
+        (for example  ``["--help"]``).
 
-    Returns:
-      :obj:`argparse.Namespace`: command line parameters namespace
+    Returns
+    -------
+    argparse.Namespace
+        command line parameters namespace
     """
     parser = argparse.ArgumentParser(description="Python code split tool")
     parser.add_argument(
@@ -125,37 +145,38 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def setup_logging(loglevel):
+def setup_logging(loglevel: int) -> None:
     """Setup basic logging
 
-    Args:
-      loglevel (int): minimum loglevel for emitting messages
+    Parameters
+    ----------
+    loglevel : int
+        minimum loglevel for emitting messages
     """
     log_format = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(level=loglevel, stream=sys.stdout, format=log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
 
-def main(args):
-    """Wrapper allowing :func:`fib` to be called with string arguments in a CLI fashion
+def main(args: List[str]) -> None:
+    """Wrapper allowing :func:`split_code` to be called with string arguments in a CLI fashion
 
-    Instead of returning the value from :func:`fib`, it prints the result to the
-    ``stdout`` in a nicely formatted message.
-
-    Args:
-      args (List[str]): command line parameters as list of strings
-          (for example  ``["--verbose", "42"]``).
+    Parameters
+    ----------
+    args : List[str])
+        command line parameters as list of strings
+        (for example  ``["-i", "my_source_code.py", "-f", "/path/to/output]``).
     """
-    args = parse_args(args)
-    setup_logging(args.loglevel)
-    _logger.info(f"Split code file '{args.input}' into folder '{args.folder}'")
-    split_code(args.input, args.folder)
+    settings = parse_args(args=args)
+    setup_logging(settings.loglevel)
+    _logger.info(f"Split code file '{settings.input}' into folder '{settings.folder}'")
+    split_code(settings.input, settings.folder)
     _logger.info("Script ends here")
 
 
-def run():
+def run() -> None:
     """Calls :func:`main` passing the CLI arguments extracted from :obj:`sys.argv`
 
-    This function can be used as entry point to create console scripts with setuptools.
+    This function is used as entry point for the console script by setuptools.
     """
     main(sys.argv[1:])
 
@@ -169,6 +190,6 @@ if __name__ == "__main__":
     # After installing your project with pip, users can also run your Python
     # modules as scripts via the ``-m`` flag, as defined in PEP 338::
     #
-    #     python -m code_split.skeleton 42
+    #     python -m code_split.code_split -i my_source_code.py
     #
     run()
