@@ -125,7 +125,7 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         version="code_split {ver}".format(ver=__version__),
     )
     parser.add_argument("-i", "--input", required=True, type=str, help="Python code file to be split")
-    parser.add_argument("-f", "--folder", type=str, help="Destination folder for the splitted code")
+    parser.add_argument("-f", "--folder", type=str, help="Destination folder for the split code")
     parser.add_argument(
         "-v",
         "--verbose",

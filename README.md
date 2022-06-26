@@ -10,12 +10,35 @@ The newly created files will contain class/function decorators as well as commen
 
 Intermediate comments and the main code will be ignored.
 
+## Usage
+
+The tool requires at least the source code file name, optionally an output path can be specified.
+The source file name and the output folder can be relative to the current working directory or with absolute path.
+
+```text
+usage: code_split [-h] [--version] -i INPUT [-f FOLDER] [-v] [-vv]
+
+Python code split tool
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -i INPUT, --input INPUT
+                        Python code file to be split
+  -f FOLDER, --folder FOLDER
+                        Destination folder for the split code
+  -v, --verbose         set loglevel to INFO
+  -vv, --very-verbose   set loglevel to DEBUG
+```
+
 ### Example
 
-Source code:
+Below shows the source files and the new files created from it by the command `code_split -i source_code.py`:
+
+`source_code.py`
 
 ```python
-"""Source header and imports will be ignoerd"""
+"""Source header and imports will be ignored"""
 import logging
 from dataclasses import dataclass
 
@@ -51,7 +74,7 @@ The resulting files will be:
 `MyData.py`
 
 ```python
-# First trying a dataclass
+# This is the first exported class
 @dataclass
 class MyData:
     """Sample dataclass"""
@@ -74,30 +97,9 @@ def my_function(data: MyData) -> str:
 
 ```
 
-## Usage
-
-The tool requires at least the source code file name, optionally an output path can be specified.
-The source file name and the output folder can be relative to the current working directory or with absolute path.
-
-```txt
-usage: code_split [-h] [--version] -i INPUT [-f FOLDER] [-v] [-vv]
-
-Python code split tool
-
-options:
-  -h, --help            show this help message and exit
-  --version             show program's version number and exit
-  -i INPUT, --input INPUT
-                        Python code file to be split
-  -f FOLDER, --folder FOLDER
-                        Destination folder for the splitted code
-  -v, --verbose         set loglevel to INFO
-  -vv, --very-verbose   set loglevel to DEBUG
-```
-
 <!-- pyscaffold-notes -->
 
 ## Note
 
 This project has been set up using PyScaffold 4.2.2. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+information on PyScaffold see <https://pyscaffold.org/>.
