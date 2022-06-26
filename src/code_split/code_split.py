@@ -39,23 +39,43 @@ def split_code(src_code: str, folder: str) -> None:
         os.makedirs(folder)
     file_header = ""
     out_file = None
+    cache = ""
+    blank_lines = ""
+    pre_comment = ""
     try:
         with open(src_code, "r", encoding="utf-8") as file:
             for line in file.readlines():
-
+                if line.startswith("@"):
+                    cache += line
                 if line.startswith("def") or line.startswith("class"):
                     out_file_name = re.findall(r"^\w+\s+(\w+).*", line)[0] + ".py"
                     _logger.info("NEW output file: %s", out_file_name)
                     if out_file:
                         out_file.close()
                     out_file = open(os.path.join(folder, out_file_name), "w", encoding="utf-8")
+                    out_file.write(pre_comment)
+                    pre_comment = ""
+                    out_file.write(cache)
+                    cache = ""
+                    blank_lines = ""
                 elif not line.startswith(" ") and len(line.strip()) and out_file:
                     # Class of function ended, either comments or main code
                     out_file.close()
                     out_file = None
-                if out_file:
+
+                if not line.strip():
+                    # cache blank lines
+                    blank_lines += line
+                    # ignore comments before functions is separated by a blank line
+                    pre_comment = ""
+                elif out_file:
+                    if blank_lines:
+                        out_file.write(blank_lines)
+                        blank_lines = ""
                     _logger.debug("> %s", line.strip())
                     out_file.write(line)
+                elif line.startswith("#"):
+                    pre_comment += line
         if out_file:
             out_file.close()
     except FileNotFoundError:
@@ -111,8 +131,8 @@ def setup_logging(loglevel):
     Args:
       loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
-    logging.basicConfig(level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
+    log_format = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+    logging.basicConfig(level=loglevel, stream=sys.stdout, format=log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
 
 def main(args):
