@@ -53,7 +53,9 @@ class SampleClass:
     return f"{dummy.output()}, age: {data.age}"
 """,
     "skip_blank_4": "\n\n",
-    "second_function": """def second_function(data: MyData) -> None:
+    "second_function": """def second_function(
+    data: MyData
+) -> None:
     \"\"\"Print the data
 
     Parameters

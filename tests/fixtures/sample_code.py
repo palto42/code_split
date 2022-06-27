@@ -45,7 +45,9 @@ def my_function(data: MyData) -> str:
     return f"{dummy.output()}, age: {data.age}"
 
 
-def second_function(data: MyData) -> None:
+def second_function(
+    data: MyData
+) -> None:
     """Print the data
 
     Parameters
