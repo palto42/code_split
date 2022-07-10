@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
-COPY .tox/dist /app
+COPY dist /app
 
 # Upgrdae pip but ignore "running as root" warning
 RUN pip install --upgrade pip 2>/dev/null
