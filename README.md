@@ -112,7 +112,7 @@ The latest docker image can also be crated with `tox -e docker`.
 
 After building the image, it is exported as `tar` file to the `./dist` folder.
 
-Install the image from `tar` with the command `docker load -i <file.tar>`.
+Install the image from `tar` with the command `gunzip -c <file.tar.gz> | docker load`
 
 ### Execute script
 
