@@ -97,6 +97,33 @@ def my_function(data: MyData) -> str:
 
 ```
 
+## Run as docker image
+
+### Build image
+
+Note: docker tags must not contain the `+` char, that's why it is replaced by `-`in blow command.
+
+```sh
+# from project base path
+VERSION=$(python -m setuptools_scm) docker build --build-arg VERSION="$VERSION" --rm --pull -f Dockerfile -t "codesplit:latest" -t "codesplit:${VERSION//[+]/-}" .
+```
+
+The latest docker image can also be crated with `tox -e docker`.
+
+After building the image, it is exported as `tar` file to the `./dist` folder.
+
+Install the image from `tar` with the command `docker load -i <file.tar>`.
+
+### Execute script
+
+Note: The `-u` option is used in order to run the script inside docker as current user instead of the default docker user.
+
+```sh
+docker run --rm -u $(id -u ${USER}):$(id -g ${USER}) -v $(pwd)/tmp:/src codesplit:latest code_split -i /src/sample_code.py -f /src/split
+```
+
+---
+
 <!-- pyscaffold-notes -->
 
 ## Note

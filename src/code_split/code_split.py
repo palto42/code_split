@@ -9,8 +9,6 @@ import sys
 from pathlib import Path
 from typing import List
 
-from attr import s
-
 from code_split import __version__
 
 __author__ = "Matthias Homann"
@@ -75,7 +73,7 @@ def split_code(src_code: str, folder: str) -> None:
                     cache = ""
                     blank_lines = ""
                 elif not (line.startswith(" ") or line.startswith(")")) and len(line.strip()) and out_file:
-                    # Class of function ended, either comments or main code
+                    # Class or function ended, either comments or main code
                     out_file.close()
                     out_file = None
 
