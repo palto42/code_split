@@ -74,7 +74,7 @@ def split_code(src_code: str, folder: str) -> None:
                     out_file.write(cache)
                     cache = ""
                     blank_lines = ""
-                elif not line.startswith(" ") and len(line.strip()) and out_file:
+                elif not (line.startswith(" ") or line.startswith(")")) and len(line.strip()) and out_file:
                     # Class of function ended, either comments or main code
                     out_file.close()
                     out_file = None
