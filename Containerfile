@@ -20,4 +20,5 @@ RUN python -m pip install /app/code_split-${VERSION}.tar.gz
 # No need to create a non-root user inside the container because podmand runs rootless.
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["code_split"]
+ENTRYPOINT ["code_split"]
+# CMD ["--help"]

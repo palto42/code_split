@@ -119,7 +119,7 @@ Install the image from `tar` with the command `gunzip -c <file.tar.gz> | docker 
 `podman` runs rootless as the current user.
 
 ```sh
-podman run --rm  -v $(pwd)/tmp:/src code_split:latest code_split -i /src/sample_code.py -f /src/split
+podman run --rm -v ./tmp:/src code_split -i /src/sample_code.py -f /src/split
 ```
 
 ### podman rootless
