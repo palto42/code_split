@@ -97,22 +97,22 @@ def my_function(data: MyData) -> str:
 
 ```
 
-## Run as docker image
+## Run as container image
 
 ### Build image
 
-Note: docker tags must not contain the `+` char, that's why it is replaced by `-`in blow command.
+Note: container tags must not contain the `+` char, that's why it is replaced by `-`in blow command.
 
 ```sh
 # from project base path
-VERSION=$(python -m setuptools_scm) docker build --build-arg VERSION="$VERSION" --rm --pull -f Dockerfile -t "codesplit:latest" -t "codesplit:${VERSION//[+]/-}" .
+VERSION=$(python -m setuptools_scm) podman build --build-arg VERSION="$VERSION" --rm --pull -f Dockerfile -t "codesplit:latest" -t "codesplit:${VERSION//[+]/-}" .
 ```
 
-The latest docker image can also be crated with `tox -e docker`.
+The latest container image can also be crated with `tox -e pod`.
 
-After building the image, it is exported as `tar` file to the `./dist` folder.
+After building the image with `tox`, it is exported as `tar` file to the `./dist` folder.
 
-Install the image from `tar` with the command `gunzip -c <file.tar.gz> | docker load`
+Install the image from `tar` with the command `gunzip -c <file.tar.gz> | podman load`
 
 ### Execute script
 
@@ -132,10 +132,10 @@ see [podman > set subuid and subgid](https://wiki.archlinux.org/title/Podman#Set
 
 #### Docker
 
-Note: The `-u` option is used in order to run the script inside docker as current user instead of the default docker user.
+Note: The `-u` option is used in order to run the script inside docker as current user instead of the default docker user (root).
 
 ```sh
-docker run --rm -u $(id -u ${USER}):$(id -g ${USER}) -v $(pwd)/tmp:/src codesplit:latest code_split -i /src/sample_code.py -f /src/split
+docker run --rm -u $(id -u ${USER}):$(id -g ${USER}) -v $(pwd)/tmp:/src code_split -i /src/sample_code.py -f /src/split
 ```
 
 ---
