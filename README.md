@@ -116,6 +116,22 @@ Install the image from `tar` with the command `gunzip -c <file.tar.gz> | docker 
 
 ### Execute script
 
+`podman` runs rootless as the current user.
+
+```sh
+podman run --rm  -v $(pwd)/tmp:/src code_split:latest code_split -i /src/sample_code.py -f /src/split
+```
+
+### podman rootless
+
+If `podman` is executed with `sudo -u my_user`, the user account must be configured with `loginctl enable-linger my_user` configured.
+For more information about this command see [Configure Systemd to Enable User Processes to Continue to Run After Logout](https://docs.oracle.com/en/operating-systems/oracle-linux/8/obe-systemd-linger/)
+
+At least for the build process the `subuid`and `subgid` must be configured for the user,
+see [podman > set subuid and subgid](https://wiki.archlinux.org/title/Podman#Set_subuid_and_subgid).
+
+#### Docker
+
 Note: The `-u` option is used in order to run the script inside docker as current user instead of the default docker user.
 
 ```sh
